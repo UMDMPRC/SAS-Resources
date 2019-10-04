@@ -1,0 +1,118 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usepackage{hyperref}
+\setbeamertemplate{footline}[frame number]
+\title{Quick SAS Tips}
+\author{\texorpdfstring{Heide Jackson \newline\url{heidej@umd.edu}}{Author}}
+\institute{University of Maryland Population Research Center}
+
+\date{August 2019}
+
+\begin{document}
+\maketitle
+\begin{frame}{High Level Things to Know}
+\begin{itemize}
+\item SAS is a statistical software package well suited to handling large data sets
+\item Federal data sets are commonly stored as SAS data files (these end in the extension sas7bdat)
+\item SAS can handle multiple data sets simultaneously and keep them in its remote memory.
+\item SAS is not case sensitive and has extensions for using other languages particularly SQL and Python.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{SAS Versions}
+
+\item SAS 9,4 is available for download for University of Maryland affiliates.
+\item SAS can be accessed online via SAS Studio
+
+\end{frame}
+
+\begin{frame}[fragile]{The basics of doing anything in SAS}{Loading in Data}
+\begin{itemize}
+\item Most data is loaded, modified and saved within a data statement.  This corresponds to: 
+\begin{verbatim}
+data new; /*Saves new data*/
+set existing; /*Loads existing data set*/
+run; /*Runs or compiles the statement*/
+\end{verbatim}
+\item Performing analysis on an existing data follows the following structure:
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{The basics of doing anything in SAS}{Analyzing Data}
+\begin{itemize}
+\item Once the data is loaded, analysis can be run using the following general structure.
+\begin{verbatim}
+proc somecommand data=existing;
+intermediate statements;
+run;
+\end{verbatim}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Finding and Working with Data}
+\begin{itemize}
+\item By default SAS looks for data and stores data within a temporary working directory.  This can be found in SAS's explorer window.
+\item Data sets also exist in a directory internal to sas called sashelp.
+\item Users can tell SAS to look at external directories with a libname statement.
+\begin{verbatim}
+libname somename "/specified/full/location";
+\end{verbatim}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Working with Outside Data Locations}
+\begin{itemize}
+\item Once a libname is specified, data can be loaded in and saved in other locations.
+\item Data can be saved by adding such a location to the data step.
+
+\item Here's a hypothetical example:
+\begin{verbatim}
+libname save "/specified/full/location";
+libname load "/specified/full/location2";
+
+data save.data;
+set load.read;
+run;
+\end{verbatim}
+\end{itemize}
+\end{frame}
+
+
+\end{frame}
+\begin{frame}[fragile]{Exporting Data}
+\begin{itemize}
+    \item Data can be easily exported to other programs and format.
+    \item Two formats frequently used are xlsx (excel) and dta (stata).
+    \begin{verbatim}
+    proc export data=somesasdata filename="\full 
+    location\
+    dataname.extension" dbms=extension;
+    /*Example of common extensions 
+    are .xlsx or .dta*/
+    run;
+        \end{verbatim}
+    \end{itemize}
+    \end{frame}
+
+
+\begin{frame}{General Suggestions for Getting Started}
+\begin{itemize}
+
+    \item The commands shown here can be entered via SAS's program editor.
+        \item The program editor will be the script that allows users to create and reproduce data and results.
+        \item Always use the log file to confirm that code was executed correctly.
+        \item Unless data needs to be shared, there isn't a need to save it to a physical location.  The working directory works.
+        \item It is good practice to use a different name for data in the data step versus the set step--this prevents data from being overwritten.
+
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
