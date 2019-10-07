@@ -1,0 +1,333 @@
+\documentclass{beamer}
+
+\usepackage[utf8]{inputenc}
+
+\usepackage{verbatim}
+
+\usepackage{tikz}
+
+\usepackage{hyperref}
+
+\setbeamertemplate{footline}[frame number]
+
+\title{Quick SAS Tips}
+
+\author{\texorpdfstring{Heide Jackson \newline\url{heidej@umd.edu}}{Author}}
+
+\institute{University of Maryland Population Research Center}
+
+
+
+\date{August 2019}
+
+
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{High Level Things to Know}
+
+\begin{itemize}
+
+\item SAS is a statistical software package well suited to handling large data sets
+
+\item Federal data sets are commonly stored as SAS data files (these end in the extension sas7bdat)
+
+\item SAS can handle multiple data sets simultaneously and keep them in its remote memory.
+
+\item SAS is not case sensitive and has extensions for using other languages particularly SQL and Python.
+
+\item Sas supports comments within /* */ symbols.
+
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+\begin{frame}{SAS Versions}
+
+\begin{itemize}
+
+\item SAS 9,4 is available for download for University of Maryland affiliates.
+
+\item SAS can be accessed online via SAS Studio
+
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{The Basics of Doing Anything in SAS}{Loading in Data}
+
+\begin{itemize}
+
+\item Most data is loaded, modified and saved within a data statement.  This corresponds to: 
+
+\begin{verbatim}
+
+data new; /*Saves new data*/
+
+set existing; /*Loads existing data set*/
+
+run; /*Runs or compiles the statement*/
+
+\end{verbatim}
+
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+\begin{frame}[fragile]{The Basics of Doing Anything in SAS}{Analyzing Data}
+
+\begin{itemize}
+
+\item Once the data is loaded, analysis can be run using the following general structure.
+
+\begin{verbatim}
+
+proc somecommand data=existing;
+
+intermediate statements;
+
+run;
+
+\end{verbatim}
+
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Modifying a Data Set}{Subsetting Data}
+
+\begin{itemize}
+
+    \item Variables can be created, modified and deleted within data statements.
+
+    \item If a variable is dropped or kept in the set statement, this controls what is loaded in.
+
+    \item If a variable is dropped or kept in the data statement, this controls what is saved in the new data set
+
+    \item data can be subset with a simple if statement
+
+    \item An example:
+
+    \begin{small}
+
+    \begin{verbatim}
+
+    /*Keeps these variables in the data set being made*/
+
+    data (keep=id var1 var2); 
+
+    /*Drops variable from the data being loaded in*/
+
+    set (drop=var3); 
+
+    if var1=1; /*Keeps observations only when var1=1*/
+
+    /*IMPORTANT changes aren't implemented until run*/
+
+    run; 
+
+    \end{verbatim}
+
+    \end{small}
+
+\end{itemize}
+
+
+
+\end{frame}
+
+\begin{frame}[fragile]{Modifying a Data Set}{Creating or Modifying Variables}
+
+\begin{itemize}
+
+    \item Variables can be created using an equal statement.
+
+    \item Variables can be modified with if then statements.
+
+    \item Some examples of the language used are shown on the next slide.
+
+    \end{itemize}
+
+    \end{frame}
+
+    
+
+    \begin{frame}[fragile]{Modifying a Data Set}{Creating or Modifying Variables -- Examples}
+
+    \begin{verbatim}
+
+    data something;
+
+    set somethingelse;
+
+    /*Creates a variable var1, always equal to 1*/
+
+    var1=1; 
+
+    /Creates a variable var1, always equal to var 2*/
+
+    var1=var2; 
+
+    /*If var1=1 then var2 is modified to be equal to 2*/
+
+    if var1=1 then var2=2; 
+
+    /*Modifies var2 if both conditions are met*/
+
+    if var1=1 and var3=1 then var2=2; 
+
+    ; /Modified var2 if either condition is met*/
+
+    if var1 IN (1:5) or var3=1 then var2=2
+
+    /*IMPORTANT changes aren't implemented until run*/
+
+    run; 
+
+    \end{verbatim}
+
+\end{frame}
+
+
+
+
+
+\begin{frame}[fragile]{Finding and Working with Data}
+
+\begin{itemize}
+
+\item By default SAS looks for data and stores data within a temporary working directory.  This can be found in SAS's explorer window.
+
+\item Data sets also exist in a directory internal to sas called sashelp.
+
+\item Users can tell SAS to look at external directories with a libname statement.
+
+\begin{verbatim}
+
+libname somename "/specified/full/location";
+
+\end{verbatim}
+
+\end{itemize}
+
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Working with Outside Data Locations}
+
+\begin{itemize}
+
+\item Once a libname is specified, data can be loaded in and saved in other locations.
+
+\item Data can be saved by adding such a location to the data step.
+
+
+
+\item Here's a hypothetical example:
+
+\begin{verbatim}
+
+libname save "/specified/full/location";
+
+libname load "/specified/full/location2";
+
+
+
+data save.data;
+
+set load.read;
+
+run;
+
+\end{verbatim}
+
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+\begin{frame}[fragile]{Exporting Data}
+
+\begin{itemize}
+
+    \item Data can be easily exported to other programs and format.
+
+    \item Two formats frequently used are xlsx (excel) and dta (stata).
+
+    \begin{verbatim}
+
+    proc export data=somesasdata filename="\full 
+
+    location\
+
+    dataname.extension" dbms=extension;
+
+    /*Example of common extensions 
+
+    are .xlsx or .dta*/
+
+    run;
+
+        \end{verbatim}
+
+    \end{itemize}
+
+    \end{frame}
+
+
+
+
+
+\begin{frame}{General Suggestions for Getting Started}
+
+\begin{itemize}
+
+
+
+    \item The commands shown here can be entered via SAS's program editor.
+
+        \item The program editor will be the script that allows users to create and reproduce data and results.
+
+        \item Always use the log file to confirm that code was executed correctly.
+
+        \item Unless data needs to be shared, there isn't a need to save it to a physical location.  The working directory works.
+
+        \item It is good practice to use a different name for data in the data step versus the set step--this prevents data from being overwritten.
+
+
+
+\end{itemize}
+
+\end{frame}
+
+
+
+
+
+
+
+\end{document}
