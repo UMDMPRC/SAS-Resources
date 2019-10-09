@@ -1,0 +1,136 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{verbatim}
+\usepackage{tikz}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\setbeamertemplate{footline}[frame number]
+\title{Intro to Macros}
+\author{\texorpdfstring{Heide Jackson \newline\url{heidej@umd.edu}}{Author}}
+\institute{University of Maryland Population Research Center}
+
+\date{August 2019}
+
+\begin{document}
+\maketitle
+\begin{frame}{High Level Things to Know}
+\begin{itemize}
+\item Macros are objects or functions called within SAS to streamline coding and reduce redundancies.
+\item This presentation will introduce macro variables and functions and how they can be useful for data manipulation.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Macro Variables}
+
+\begin{itemize}
+\item Macro variables are a way of representing an object that can later be called into a data set.
+\item Macro variables usually have a \& preceeding their name.
+\item Macro variables are often concluded with a .
+\item Let is a common way of defining the macro.
+\item Put displays the content of a macro variable.
+\item Let's see this in action:
+\end{itemize}
+\begin{verbatim}
+%let doors=HELLO;
+%put &doors.;
+\end{verbatim}
+\item Macro variables can hold multiple words numbers or other types of objects that we may want to store
+\end{frame}
+
+\begin{frame}[fragile]{When Might Macro Variables be Useful?}
+\begin{itemize}
+    \item When working with data that is repetitive and just one element might change every year (for example 2018data, 2019data etc.)--we could create a macro shorthand for referring to the year.
+    \item When working with big data sets or lists of variables. Here's an example:
+\end{itemize}
+\begin{verbatim}
+    %let keep= my long list of various things;
+    %let drop= things i do not need anymore;
+    data savedata (keep=&keep.);
+    set loaddata (drop=&drop.);
+    run;
+    
+\end{verbatim}
+\end{frame}
+\begin{frame}[fragile]{Macro Variable Types}
+\begin{itemize}
+    \item Macros can be defined globally (available throughout the sas session) or locally, available only in the context of a macro function.
+    \item Additionally, sas has some system defined macro variables and users can define their own macro variables.
+    \item To see all macros available in a session use \%put \_ALL\_;
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Macro Functions}
+\begin{itemize}
+    \item Local macro variables are often called in the context of macro functions.
+    \item Functions are a way of calling code that may get used on multiple occasions.
+    \item Let's say we want to recode all dummy variables to be 0 or 1.  Here's a macro to do it:
+    \begin{verbatim}
+%macro dummy(list);
+%let count=%sysfunc(countw(&list.));
+%do i=1 %to &count;
+%let var=%scan(&list,&i);
+if &var=2 then &var=0;
+ %end;
+%mend dummy;
+    \end{verbatim}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Macro Functions}{Unpacking the Function}
+\begin{itemize}
+    \item \%macro begins the macro function
+    \item "dummy" is the name of the function for when we call it later.
+    \item (item) contains the local macro variables used within the function.  Note: when the function is used they can have different names from whatever is specified when the macro is created.
+    \item \%sysfunc, and \%scan are internal sas functions for looking within macro objects.
+    \item \%do \%to and \%end indicate we are looping in a macro environment.
+    \item mend macro name indicates the macro is completed.
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Calling the Function}
+\begin{itemize}
+\item Once defined, this function can be used by using \% function name.
+\begin{verbatim}
+data cars; set sashelp.cars;
+Asia=1; if origin="Asia" then Asia=2;
+Europe=1; if origin="Europe" then Europe=2;
+USA=1; if origin="USA" then USA=2;
+run;
+%let mylist=Asia Europe USA;
+data cars2; set cars;
+%dummy(&mylist.);
+run;
+\end{verbatim}
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Debugging the Function}
+\begin{itemize}
+    \item SAS has two options, mlogic and mprint that can help unpack what a function does and how it interprets macro objects.
+    \item These options can sometimes be quite verbose, so they should be mainly used for debugging purposes.
+\end{itemize}
+\end{frame}
+\begin{frame}[fragile]{Defining Macro Variables in SQL}
+\begin{itemize}
+    \item SQL can be very useful for defining macro variables and macro lists.
+    \item The into command of SQL can help us do this.
+    \begin{verbatim}
+        proc sql; 
+select distinct origin into :orig separated by " "
+from sashelp.cars;
+quit;
+    \end{verbatim}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Using Macros to Read in Other SAS Scripts}
+\begin{itemize}
+\item The include command can be used to reference libnames or macros stored in other files.
+\item This can often be useful if there are a list of functions or libraries that you want to call without adding bulk and redundancy to your current sas script.
+\begin{verbatim}
+/*Reads in library locations stored in a 
+sas file and makes them available in session*/
+%include "somelocations\libnames.sas";
+\end{verbatim}
+\end{itemize}
+\end{frame}
+\end{document}
