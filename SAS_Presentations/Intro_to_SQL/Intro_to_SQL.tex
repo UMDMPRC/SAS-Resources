@@ -106,7 +106,7 @@ quit;
     /*Select can be used to specify subsets
     from different data sources */
     select a.* b.hitspteam 
-    from sas.baseball as a, baseballsql as b
+    from sashelp.baseball as a, baseballsql as b
     where a.team=b.team and nhits<100;
     quit;
 \end{verbatim}
